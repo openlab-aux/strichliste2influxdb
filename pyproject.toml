@@ -1,0 +1,31 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "strichliste2influxdb"
+description = 'Ever wonder how much Mate your hackspace is consuming?'
+readme = "README.md"
+version = "0.0.1"
+requires-python = ">=3.9"
+license = "GPL-3.0-or-later"
+authors = [
+  { name = "Johannes Fürmann", email = "fuermannj@gmail.com" },
+]
+
+dependencies = [
+  'requests',
+  'fire',
+  'marshmallow',
+  'marshmallow-dataclass',
+  'influxdb_client'
+]
+
+[project.optional-dependencies]
+dev = [
+  'black',
+  'pytest'
+]
+
+[project.scripts]
+strichliste2influxdb = "strichliste2influxdb.cli:main"
