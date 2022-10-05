@@ -13,5 +13,7 @@ RUN mkdir /app
 COPY --from=builder /src/dist/* ./
 RUN pip install strichliste2influxdb-*.tar.gz
 
+ENV PYTHONUNBUFFERED 1
+
 ENTRYPOINT ["strichliste2influxdb"]
 CMD ["update"]
