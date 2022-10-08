@@ -2,6 +2,7 @@ import os
 from sys import api_version
 from datetime import datetime
 import time
+from pprint import pprint
 
 from fire import Fire
 from influxdb_client import InfluxDBClient, Point
@@ -22,8 +23,11 @@ write_api = influx.write_api(write_options=SYNCHRONOUS)
 def render():
     client = StrichlisteClient(os.environ.get("STRICHLISTE_BASE_URL"))
     articles = list(client.get_articles())
-    from pprint import pprint; pprint(sorted(articles, key=lambda a: a.usageCount, reverse=True))
-    print(len(articles))
+    pprint(sorted(articles, key=lambda a: a.usageCount, reverse=True))
+
+    metrics = client.get_metrics()
+    pprint(metrics)
+    
 
 def update():
     client = StrichlisteClient(os.environ.get("STRICHLISTE_BASE_URL"))
@@ -42,9 +46,25 @@ def update():
                 record=record
             )
 
-        write_api.flush()
 
-        print(f"[i] wrote {len(articles)} points to influx")
+        metrics = client.get_metrics()
+
+        for k,v in {
+            "user_count": metrics.userCount,
+            "balance": metrics.balance,
+            "transaction_count": metrics.transactionCount
+        }.items():
+            p = Point(k)
+            p.field(field="value", value=v)
+
+            write_api.write(
+                bucket=os.environ.get("INFLUXDB_BUCKET"),
+                org=os.environ.get("INFLUXDB_ORG"),
+                record=p
+           )
+
+
+        write_api.flush()
 
         time.sleep(UPDATE_INTERVAL)
 

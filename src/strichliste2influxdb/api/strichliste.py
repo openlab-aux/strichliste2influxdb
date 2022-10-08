@@ -17,6 +17,14 @@ class Article:
 
 articles_schema = marshmallow_dataclass.class_schema(Article)(many=True, unknown=EXCLUDE)
 
+@dataclass
+class Metrics:
+    balance: int
+    transactionCount: int
+    userCount: int
+
+metrics_schema = marshmallow_dataclass.class_schema(Metrics)(unknown=EXCLUDE)
+
 
 class StrichlisteClient(Session):
     """
@@ -47,6 +55,14 @@ class StrichlisteClient(Session):
 
             for a in articles:
                 yield a
+    
+    def get_metrics(self) -> Metrics:
+        res = self.get(
+            urljoin(self._base_url, "metrics"), 
+        ).json()
+
+        metrics = metrics_schema.load(res)
+        return metrics
 
             
             
