@@ -1,4 +1,4 @@
-FROM python:3.10-buster AS builder
+FROM python:3.11-buster AS builder
 
 RUN mkdir /src
 WORKDIR /src
@@ -7,7 +7,7 @@ COPY ./ /src/
 RUN pip install build
 RUN python -m build
 
-FROM python:3.10-alpine3.15
+FROM python:3.11-alpine3.15
 
 RUN mkdir /app
 COPY --from=builder /src/dist/* ./
